@@ -1,4 +1,6 @@
-"""Day14: 제공된 정상 이미지로 학습합니다. test는 읽지 않습니다."""
+"""사전학습된 CNN의 특징 추출 부분(Backbone)은 그대로 유지하고, 
+마지막 분류층(Head)만 새로운 문제에 맞게 교체하는 전이학습"""
+
 from pathlib import Path
 import json
 import numpy as np
@@ -25,16 +27,19 @@ model = nn.Sequential(
     nn.AdaptiveAvgPool2d((4, 4)), nn.Flatten(), nn.Linear(256, 3),
 )
 # 안전한 수치 배열만 읽습니다. Target 이미지로 사전학습한 파일이 아닙니다.
+# 사전 학습된 가중치 불러오기
 with np.load(DATA / "source_backbone.npz", allow_pickle=False) as saved:
     state = model.state_dict()
     state.update({name: torch.from_numpy(saved[name].copy()) for name in saved.files})
 model.load_state_dict(state)
+# load_state_dict()는 기본적으로 파라미터 이름과 텐서 크기를 기준으로 가중치를 대응시킴. 같은 이름의 텐서 크기가 다르면 오류가 발생
+# 실제 전이학습에서는 가중치를 재사용할 Backbone의 구조를 원본과 동일하게 유지하는 것이 일반적
 
 for p in model.parameters():
     p.requires_grad = False
-# TODO B02: 256개 특징에서 3개 logit을 출력하는 새 Linear Head를 만드세요.
-# BEGIN B02
-model[9] = nn.Linear(256, 1)  # 출력 개수를 고치세요.
+# 여기서 model[9]는 새로운 객체로 교체되므로 기존 Head의 가중치는 버려지고, 새로운 가중치가 무작위로 초기화됨
+model[9] = nn.Linear(256, 3)
+
 # END B02
 print("source 종류: 별도 합성 이미지로 사전학습한 TinyShapeCNN")
 print("학습 파라미터:", sum(p.numel() for p in model.parameters() if p.requires_grad))

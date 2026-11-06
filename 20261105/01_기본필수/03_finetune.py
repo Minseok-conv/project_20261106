@@ -46,7 +46,10 @@ for strategy in ["head", "partial"]:
     # BEGIN B03
     for p in model[9].parameters():
         p.requires_grad = True
-    # partial에서 model[4]의 파라미터도 True로 바꾸는 코드를 추가하세요.
+
+    if strategy == "partial":
+        for p in model[4].parameters():
+            p.requires_grad = True
     # END B03
     model.eval()  # BN 통계는 두 전략 모두 고정합니다.
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.003, weight_decay=0.0)

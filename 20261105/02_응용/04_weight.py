@@ -27,10 +27,8 @@ y_train = torch.tensor(train.targets, dtype=torch.long)
 X_valid = torch.stack([valid[i][0] for i in range(len(valid))])
 y_valid = torch.tensor(valid.targets, dtype=torch.long)
 
-# TODO A04: 같은 head 모델에서 none, weight 두 조건을 비교하세요.
-# BEGIN A04
-experiments = [("head", "none")]  # ("head", "weight")를 추가하세요.
-# END A04
+experiments = [("head", "none"),("head", "weight")]  
+
 rows = []
 all_history = []
 for strategy, balance in experiments:
@@ -57,6 +55,7 @@ for strategy, balance in experiments:
     model.eval()
     optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=0.003, weight_decay=0.0001)
     counts = torch.bincount(y_train, minlength=3).float()
+    # bincount는 각 정수 레이블이 몇 번 등장했는지 계산하는 함수.
     inverse = 1.0 / counts
     class_weights = inverse / inverse.mean()
     criterion = nn.CrossEntropyLoss(weight=class_weights if balance == "weight" else None)
@@ -83,3 +82,6 @@ for strategy, balance in experiments:
 print("train class_weights:",class_weights.tolist())
 table=pd.DataFrame(rows);table.to_csv(OUT/"weight_comparison.csv",index=False)
 print(table.drop(columns="seconds").round(4).to_string(index=False))
+
+# Bias: 신경망 내부의 학습 가능한 파라미터
+# Class Weight: 손실 함수에서 특정 클래스의 오차를 얼마나 중요하게 취급할지 결정하는 값

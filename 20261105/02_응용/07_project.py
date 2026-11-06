@@ -28,10 +28,9 @@ y_train = torch.tensor(train.targets, dtype=torch.long)
 X_valid = torch.stack([valid[i][0] for i in range(len(valid))])
 y_valid = torch.tensor(valid.targets, dtype=torch.long)
 
-# TODO A07: Head 기준선·Partial·Head+weight 세 조건을 고정하세요.
-# BEGIN A07
-experiments=[("head","none")]  # 나머지 두 조건을 추가하세요.
-# END A07
+experiments=[("head","none"),
+    ("partial", "none"),
+    ("head", "weight")]  
 rows = []
 all_history = []
 for strategy, balance in experiments:
@@ -84,10 +83,14 @@ for strategy, balance in experiments:
 pd.DataFrame(rows).to_csv(OUT/"metrics.csv",index=False)
 pd.DataFrame(all_history).to_csv(OUT/"history.csv",index=False)
 # 마지막 head+weight 후보의 예측을 설명용으로 저장합니다. 자동 최고 모델이라고 부르지 않습니다.
-# TODO A08: 실제 y_valid와 pred를 표에 넣으세요. valid.samples와 같은 순서입니다.
-# BEGIN A08
-result=pd.DataFrame(columns=["file","actual","predicted","confidence"])  # 실제 예측 표로 바꾸세요.
-# END A08
+
+result = pd.DataFrame({
+    "file": [Path(p).name for p, _ in valid.samples],
+    "actual": y_valid.numpy(),
+    "predicted": pred.numpy(),
+    "confidence": prob.max(dim=1).values.numpy()
+})
+
 result.to_csv(OUT/"predictions.csv",index=False)
 pd.DataFrame(confusion_matrix(y_valid,pred,labels=[0,1,2]),index=valid.classes,columns=valid.classes).to_csv(OUT/"confusion.csv")
 predictions=pred;probabilities=prob

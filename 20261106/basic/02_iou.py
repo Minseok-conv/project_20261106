@@ -17,7 +17,7 @@ for p in pred.itertuples():
         # >>> B02
         # 요구: intersection을 union으로 나누어 iou를 계산하세요.
         # 이 실습의 데이터는 모두 양의 면적이므로 union은 0이 아닙니다.
-        pass  # TODO B02: 위 요구사항의 핵심 코드를 작성하세요.
+        iou = intersection / union
         # <<< B02
         overlaps.append(iou)
     matched = False
@@ -26,7 +26,10 @@ for p in pred.itertuples():
             continue
         # >>> B03
         # 요구: 같은 클래스의 미사용 정답에 IoU>=0.5이면 연결하고 used에 기록하세요.
-        pass  # TODO B03: 위 요구사항의 핵심 코드를 작성하세요.
+        if overlaps[j] >= 0.5:
+            used.add(j)
+            matched = True
+            break
         # <<< B03
     rows.append([p.class_id, p.confidence, round(max(overlaps), 4), "TP" if matched else "FP"])
 table = pd.DataFrame(rows, columns=["class", "confidence", "max_iou", "result"])

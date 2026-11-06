@@ -72,7 +72,9 @@ for kind, index in selected:
     weights = gradient.mean(dim=(2, 3), keepdim=True)
     # TODO B06: 채널 가중합에 relu()를 적용해 양의 반응만 남기세요.
     # BEGIN B06
-    cam = torch.zeros_like(features[:, 0])  # 채널 가중합과 relu로 바꾸세요.
+    cam = torch.relu(
+        (weights*features).sum(dim = 1)
+    )  # 채널 가중합과 relu로 바꾸세요.
     # END B06
     cam = torch.nn.functional.interpolate(cam.unsqueeze(1), size=(32,32), mode="bilinear", align_corners=False)[0,0].detach().numpy()
     cam = cam / max(float(cam.max()), 1e-8)

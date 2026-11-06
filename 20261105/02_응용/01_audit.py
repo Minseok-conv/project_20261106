@@ -1,4 +1,5 @@
-"""Day14: 제공된 정상 이미지로 학습합니다. test는 읽지 않습니다."""
+"""이미지 분류 모델을 학습하기 전에 데이터셋의 클래스 분포를 분석하고,
+train·valid·test 사이에 중복된 이미지가 있는지 검사하는 코드"""
 from pathlib import Path
 import json
 import numpy as np
@@ -28,7 +29,7 @@ for split in ["train", "valid", "test"]:
     for label, name in enumerate(dataset.classes):
         # TODO A01: 해당 라벨의 개수를 세세요.
         # BEGIN A01
-        count = 0  # dataset.targets에서 label의 수를 세세요.
+        count = dataset.targets.count(label) # dataset.targets에서 label의 수를 세세요.
         # END A01
         rows.append({"split": split, "class": name, "n": count, "ratio": count/len(dataset)})
     for path,_ in dataset.samples:

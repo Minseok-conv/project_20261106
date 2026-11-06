@@ -58,7 +58,7 @@ with torch.no_grad():
 
 # TODO A05: 실제값과 예측값이 다른 행의 인덱스를 구하세요.
 # BEGIN A05
-indices = []  # 예측과 실제가 다른 인덱스를 구하세요.
+indices = torch.where(predictions != y_valid)[0].tolist() # 예측과 실제가 다른 인덱스를 구하세요.
 # END A05
 records=[]
 for old in OUT.glob("error_*.png"):old.unlink()

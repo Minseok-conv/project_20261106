@@ -24,9 +24,7 @@ y_true = [0] * 12 + [1] * 6 + [2] * 3
 y_pred = [0] * 21
 print("클래스 수:", [y_true.count(i) for i in range(3)])
 print("Accuracy:", round(accuracy_score(y_true, y_pred), 4))
-# TODO B04: f1_score에 average="macro", labels=[0,1,2], zero_division=0을 넣으세요.
-# BEGIN B04
-macro = 0.0  # f1_score 계산으로 바꾸세요.
-# END B04
+macro = f1_score(y_true,y_pred, average = "macro", labels = [0,1,2], zero_division = 0)
+# 클래스별 F1 Score를 단순 평균
 print("Macro F1:", round(macro, 4))
 print(classification_report(y_true, y_pred, labels=[0, 1, 2], target_names=["circle", "square", "triangle"], zero_division=0, digits=3))

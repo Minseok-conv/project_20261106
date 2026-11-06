@@ -50,10 +50,8 @@ best_loss = float("inf")
 for epoch in range(1, 9):
     optimizer.zero_grad()
     loss = criterion(model(X_train), y_train)
-    # TODO B07: 역전파와 Optimizer 갱신을 수행하세요.
-    # BEGIN B07
-    pass  # loss.backward()와 optimizer.step() 두 문장을 작성하세요.
-    # END B07
+    loss.backward()
+    optimizer.step()  
     with torch.no_grad():
         valid_loss = criterion(model(X_valid), y_valid).item()
     history.append({"epoch": epoch, "valid_loss": valid_loss})
@@ -65,18 +63,18 @@ model.load_state_dict(best_state)
 with torch.no_grad():
     logits = model(X_valid)
     probabilities = logits.softmax(1)
-    # TODO B08: 각 행의 가장 큰 logit 열을 예측 라벨로 고르세요.
-    # BEGIN B08
-    predictions = torch.zeros(len(valid), dtype=torch.long)  # argmax로 바꾸세요.
-    # END B08
+    predictions = logits.argmax(dim = 1)  # argmax로 바꾸세요.
+
 metrics = {"accuracy": accuracy_score(y_valid, predictions), "macro_f1": f1_score(y_valid, predictions, labels=[0,1,2], average="macro", zero_division=0), "best_epoch": best_epoch, "valid_n": len(valid), "source": "synthetic_source_pretraining", "test_used": False}
 pd.DataFrame([metrics]).to_csv(OUT / "metrics.csv", index=False)
 pd.DataFrame(history).to_csv(OUT / "history.csv", index=False)
 pd.DataFrame({"file": [Path(p).name for p,_ in valid.samples], "actual": y_valid.numpy(), "predicted": predictions.numpy(), "confidence": probabilities.max(1).values.numpy()}).to_csv(OUT / "predictions.csv", index=False)
-# TODO B09: metrics를 UTF-8 JSON 문자열로 저장하세요. 아래 제공된 경로를 사용합니다.
-# BEGIN B09
-pass  # write_text로 metrics JSON을 저장하세요.
-# END B09
+
+(OUT / "metrics.json").write_text(
+    json.dumps(metrics, ensure_ascii=False, indent=2),
+    encoding="utf-8"
+)
+
 pd.DataFrame(confusion_matrix(y_valid, predictions, labels=[0,1,2]), index=valid.classes, columns=valid.classes).to_csv(OUT / "confusion.csv")
 for old in OUT.glob("project_error_*.png"):
     old.unlink()

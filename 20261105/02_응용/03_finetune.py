@@ -29,7 +29,7 @@ y_valid = torch.tensor(valid.targets, dtype=torch.long)
 
 # TODO A03: Head-only, Partial 두 전략만 비교하세요. 데이터와 epoch는 고정합니다.
 # BEGIN A03
-experiments = [("head", "none")]  # partial 후보를 추가하세요.
+experiments = [("head","none"),("partial","none")]  # partial 후보를 추가하세요.
 # END A03
 rows = []
 all_history = []

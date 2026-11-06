@@ -56,7 +56,7 @@ with torch.no_grad():
 
 # TODO B05: 실제 y_valid와 predictions로 혼동행렬을 만드세요. 행=실제, 열=예측.
 # BEGIN B05
-matrix = np.zeros((3, 3), dtype=int)  # confusion_matrix 호출로 바꾸세요.
+matrix = confusion_matrix(y_valid, predictions, labels=[0, 1, 2])  # confusion_matrix 호출로 바꾸세요.
 # END B05
 print("혼동행렬:\n", matrix)
 print(classification_report(y_valid, predictions, labels=[0, 1, 2], target_names=valid.classes, zero_division=0, digits=3))
